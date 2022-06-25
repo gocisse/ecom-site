@@ -19,6 +19,6 @@ func (app *application) routes() http.Handler {
 		AllowCredentials: false,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
-	mux.Get("/api/v2/", app.apiHandler)
+	mux.Post("/api/v2/", app.apiHandler)
 	return mux
 }

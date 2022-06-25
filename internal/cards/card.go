@@ -23,6 +23,7 @@ func  (c *Card) Charge(amount int, currency string) (*stripe.PaymentIntent, stri
 }
 
 func (c *Card) createPaymentIntent(amount int, currency string) (*stripe.PaymentIntent, string, error) {
+	stripe.Key = c.Secret
 
 	params := &stripe.PaymentIntentParams{
 		Amount:   stripe.Int64(int64(amount)),

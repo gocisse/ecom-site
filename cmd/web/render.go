@@ -17,6 +17,8 @@ type TemplateData struct {
 	API       string
 	Warning   string
 	Error     string
+	StripePublishableKey string
+	StripeSecretKey string
 }
 
 //functions to pass in the template
@@ -27,7 +29,8 @@ var templateFS embed.FS
 
 func (app *application) addDefaultValue(td *TemplateData, r *http.Request) *TemplateData {
 	td.API = app.config.api
-	
+	td.StripePublishableKey = app.config.stripe.key
+	td.StripeSecretKey = app.config.stripe.secret
 	return td
 }
 
