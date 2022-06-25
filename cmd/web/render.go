@@ -54,6 +54,17 @@ func (app *application) renderTemplate(w http.ResponseWriter, r *http.Request, p
 		app.templateCache[templateToRender] = t
 	}
 
+	if td == nil {
+		td = &TemplateData{}
+	}
+
+	td = app.addDefaultValue(td, r)
+
+	err = t.Execute(w, td)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
