@@ -27,7 +27,7 @@ var templateFS embed.FS
 
 func (app *application) addDefaultValue(td *TemplateData, r *http.Request) *TemplateData {
 	td.API = app.config.api
-	td.CSRFToken = r.Header.Get("X-CSRF-Token")
+	
 	return td
 }
 
@@ -36,7 +36,7 @@ func (app *application) renderTemplate(w http.ResponseWriter, r *http.Request, p
 	var err error
 
 	//template to render
-	templateToRender := fmt.Sprintf("%s.page.html", page)
+	templateToRender := fmt.Sprintf("templates/%s.page.html", page)
 
 	//check if template is in our cache
 	_, templateInCache := app.templateCache[templateToRender]
@@ -74,7 +74,7 @@ func (app *application) parseTemplate(partials []string, page string, templateTo
 
 	if len(partials) > 0 {
 		for i, x := range partials {
-			partials[i] = fmt.Sprintf("%s.partial.html", x)
+			partials[i] = fmt.Sprintf("templates/%s.partial.html", x)
 		}
 	}
 
@@ -88,7 +88,8 @@ func (app *application) parseTemplate(partials []string, page string, templateTo
 		return nil, err
 	}
 
-	t = app.templateCache[templateToRender]
+	//set our template cache to variable t and return it
+	app.templateCache[templateToRender] = t
 
 	return t, nil
 }
