@@ -44,3 +44,12 @@ func (app *application) Succeeded(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
+
+func (app *application) BuyOnce(w http.ResponseWriter, r *http.Request) {
+	if err := app.renderTemplate(w, r, "buy-once", &TemplateData{
+
+	}, "stripe-js"); err != nil {
+		app.errorLog.Printf("Error rendering template: %s", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+}
