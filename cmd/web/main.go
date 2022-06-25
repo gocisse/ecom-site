@@ -75,4 +75,10 @@ func main() {
 		version:       Version,
 	}
 
+	if err := app.server(); err != nil {
+		app.errorLog.Fatal(err)
+	}
+
+	
+
 }
