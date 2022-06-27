@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/gocisse/ecom-site/internal/cards"
 )
 
@@ -60,7 +61,7 @@ func (app *application) apiHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		var j = jsonResponse{
-			OK: false,
+			OK:      false,
 			Message: msg,
 		}
 
@@ -71,5 +72,30 @@ func (app *application) apiHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(out)
 	}
+
+}
+
+func (app *application) GetWidgetByID(w http.ResponseWriter, r *http.Request) {
+
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	widgetID, _ := strconv.Atoi(id)
+
+	widget, err := app.DB.GetWidgetByID(widgetID)
+	if err != nil {
+		app.errorLog.Printf("Error getting widget: %s", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	out, err := json.MarshalIndent(widget, "", " ")
+	if err != nil {
+		fmt.Println(err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(out)
 
 }

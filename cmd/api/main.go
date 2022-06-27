@@ -8,6 +8,9 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/gocisse/ecom-site/internal/drivers"
+	"github.com/gocisse/ecom-site/internal/models"
 )
 
 const Version = "1.0.1"
@@ -32,6 +35,7 @@ type application struct {
 	infoLog  *log.Logger
 	errorLog *log.Logger
 	version  string
+	DB       *models.DBModels
 }
 
 func (app *application) server() error {
@@ -54,6 +58,7 @@ func main() {
 
 	flag.IntVar(&cfg.port, "port", 3001, "port to listen on for web requests Frontend")
 	flag.StringVar(&cfg.env, "env", "development", "environment to run in  Development, Test, or Production")
+	flag.StringVar(&cfg.db.dsn, "db", "mac:momo22@tcp(localhost:3306)/widgets?parseTime=true&tls=false", "postgres dsn")
 
 	flag.Parse()
 
@@ -63,11 +68,20 @@ func main() {
 	cfg.stripe.secret = os.Getenv("STRIPE_SECRET")
 	cfg.stripe.key = os.Getenv("STRIPE_KEY")
 
+	conn, err := drivers.OpenDB(cfg.db.dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	defer conn.Close()
+
 	app := &application{
 		config:   cfg,
 		infoLog:  inforLog,
 		errorLog: errorLog,
 		version:  Version,
+		DB: &models.DBModels{
+			DB: conn,
+		},
 	}
 
 	if err := app.server(); err != nil {

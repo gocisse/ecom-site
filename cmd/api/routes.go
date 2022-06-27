@@ -20,5 +20,9 @@ func (app *application) routes() http.Handler {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 	mux.Post("/api/v2/", app.apiHandler)
+	mux.Get("/api/v2/{id}", app.GetWidgetByID)
+
+	
+
 	return mux
 }

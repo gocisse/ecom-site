@@ -8,6 +8,9 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/gocisse/ecom-site/internal/drivers"
+	"github.com/gocisse/ecom-site/internal/models"
 )
 
 const Version = "1.0.1"
@@ -33,6 +36,7 @@ type application struct {
 	errorLog      *log.Logger
 	templateCache map[string]*template.Template
 	version       string
+	DB *models.DBModels
 }
 
 func (app *application) server() error {
@@ -56,6 +60,7 @@ func main() {
 	flag.IntVar(&cfg.port, "port", 3000, "port to listen on for web requests Frontend")
 	flag.StringVar(&cfg.env, "env", "development", "environment to run in  Development, Test, or Production")
 	flag.StringVar(&cfg.api, "api", "http://localhost:3001/api/v2/", "url to the api server")
+	flag.StringVar(&cfg.db.dsn, "db", "mac:momo22@tcp(localhost:3306)/widgets?parseTime=true&tls=false", "postgres dsn")
 
 	flag.Parse()
 
@@ -67,14 +72,22 @@ func main() {
 
 	tc := make(map[string]*template.Template)
 
+	conn, err := drivers.OpenDB(cfg.db.dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+	defer conn.Close()
+	
 	app := &application{
 		config:        cfg,
 		infoLog:       inforLog,
 		errorLog:      errorLog,
 		templateCache: tc,
 		version:       Version,
+		DB: &models.DBModels{
+			DB: conn,
+		},
 	}
-
 	if err := app.server(); err != nil {
 		app.errorLog.Fatal(err)
 	}
